@@ -7,7 +7,7 @@
 #define DHT11_PIN 12
 
 /****ULTRASONIC DEFINITIONS ****/
-#define TRIGGER_PIN 10 //ήταν πιν7
+#define TRIGGER_PIN 10
 #define ECHO_PIN 8
 #define MAX_DISTANCE 20
 #define uppertemp 25
@@ -34,7 +34,6 @@ int five_sec;
 
 float sum = 0;
 float meantemp = 0;
-//float dht_temp[24]; //απο προηγούμενη προσπάθεια που οι τιμές αποθηκεύοταν σε πίνακα
 float extreme = 0;
 
 boolean flag_mean = false;
@@ -42,16 +41,16 @@ boolean flag_extreme = false;
 boolean flag_random = false;
 boolean flag_distance = false;
 
-//αρχικοποίηση οθόνης
+//screen initialization
 const int numRows = 2;
 const int numCols = 16;
-char object[16]; //για μήνυμα στην οθόνη
-LiquidCrystal lcd(3, 2, 4, 5, 6, 7); //προφανως αυτα ειναι τα pins
+char object[16]; // to show a message
+LiquidCrystal lcd(3, 2, 4, 5, 6, 7); //pins to the screen
 
 
-float randomtemp = 20; //ενδιάμεση τιμή
+float randomtemp = 20; //intermediate value
 
-// NewPing setup of pins and maximum distance //CONSTRUCTOR
+// NewPing setup of pins and maximum distance, constructor 
 NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);
 
 void setup() {
@@ -81,22 +80,24 @@ void loop() {
   t.update();
   distance = sonar.ping_cm();
   if (distance > 0 && distance < 10) {
-    flag_distance = true;
-    lcd.setCursor(0, 1);
-    lcd.print("distance:");
-    lcd.setCursor(0, 0);
-    lcd.print("mean:");
-    digitalWrite(greenpin, HIGH);
-    delay(600);
-    lcd.setCursor(0, 1);
-    lcd.print("         ");
-    lcd.setCursor(0, 0);
-    lcd.print("         ");
-    lcd.setCursor(0, 1);
-    lcd.print(distance);
-    lcd.setCursor(0, 0);
-    lcd.print(meantemp);
-    Serial.println(object);
+  flag_distance = true;
+  lcd.setCursor(0, 1);
+  lcd.print("distance:");
+  lcd.setCursor(0, 0);
+  lcd.print("mean:");
+  digitalWrite(greenpin, HIGH);
+    
+  delay(600);
+  
+  lcd.setCursor(0, 1);
+  lcd.print("         ");
+  lcd.setCursor(0, 0);
+  lcd.print("         ");
+  lcd.setCursor(0, 1);
+  lcd.print(distance);
+  lcd.setCursor(0, 0);
+  lcd.print(meantemp);
+  Serial.println(object);
   }
   digitalWrite(greenpin, LOW);
 }
@@ -107,15 +108,11 @@ void readtemp() {
 
   if (DHT.temperature > 0) {
     sum = sum + DHT.temperature;
-
     Serial.println(DHT.temperature);
-
     if (DHT.temperature > uppertemp) {
       digitalWrite(redpin, HIGH);
       flag_extreme = true;
       extreme = DHT.temperature;
-
-
       if (i == 24) {
         lcd.setCursor(0, 0);
         lcd.write("mean value:");
@@ -126,7 +123,6 @@ void readtemp() {
         lcd.write("extreme: ");
         delay(1000);
         two_sec_ext = t.after(2000, lcd_extreme);
-
       }
     }
     else if (DHT.temperature < lowertemp) {
@@ -138,17 +134,15 @@ void readtemp() {
       two_sec_ext = t.after(2000, lcd_extreme);
     }
 
-
-
     if (DHT.temperature > randomtemp) {
       digitalWrite(yellowpin, HIGH);
     } else {
       digitalWrite(yellowpin, LOW);
     }
-  }
+    }
 
-  i = i + 1;
-  if (i == 24) {
+i = i + 1;
+if (i == 24) {
     meantemp = (float)sum / i;
     i = 0;
     sum = 0;
@@ -163,7 +157,7 @@ void readtemp() {
     ten_sec = t.after(10000, clearlcd_mean);
     Serial.println("mean found:   ");
     Serial.print(meantemp);
-  }
+}
 
 }
 
@@ -210,5 +204,4 @@ void clearlcd_ext() {
   t.stop(five_sec);
   digitalWrite(bluepin, LOW);
   digitalWrite(redpin, LOW);
-
 }
